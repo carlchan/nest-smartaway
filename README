@@ -1,0 +1,3 @@
+Sosumi from https://github.com/tylerhall/sosumi
+	- added patch to return exception when exceeding available device_ids
+Nest-api from https://github.com/gboudreau/nest-api
