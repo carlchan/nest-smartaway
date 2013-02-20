@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#############
+
+smartawaypath="/usr/local/bin"
+
+#############
+
+#detect if already running
+if [[ "`pidof -x $(basename $0) -o %PPID`" ]]; then exit 1; fi
+
+#must run as root since passwords are stored in various scripts in plaintext
+#suggest you chmod them so they're only readable by root
+if [ $(whoami) != "root" ]; then
+	exit 1
+fi
+
+#Threhold for activating away mode on NEST
+awaytime=45
+#threshold for disabling away mode on NEST
+hometime=30
+
+status=$($smartawaypath/nest-away.php)
+traveltime=$($smartawaypath/timefromhome.php)
+
+case $status in
+	Home )
+		if [ "$traveltime" -gt "$awaytime" ]; then
+			echo "Setting NEST Away mode"
+			$smartawaypath/nest-away.php Away
+		fi
+		;;
+	Away )
+		if [ "$traveltime" -lt "$hometime" ]; then
+			echo "Setting NEST Home mode"
+			$smartawaypath/nest-away.php Home
+		fi
+		;;
+	* ) echo Unknown status, not doing anything
+		;;
+esac
+
+exit 0
